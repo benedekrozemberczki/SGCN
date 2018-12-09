@@ -13,14 +13,14 @@ A PyTorch implementation of "Signed Graph Convolutional Network" (ICDM 2018).
 
 <div style="text-align:center"><img src ="danmf.jpg" ,width=720/></div>
 <p align="justify">
-Community structure is ubiquitous in real-world complex networks. The task of community detection over these networks is of paramount importance in a variety of applications. Recently, nonnegative matrix factorization (NMF) has been widely adopted for community detection due to its great interpretability and its natural fitness for capturing the community membership of nodes. However, the existing NMF-based community detection approaches are shallow methods. They learn the community assignment by mapping the original network to the community membership space directly. Considering the complicated and diversified topology structures of real-world networks, it is highly possible that the mapping between the original network and the community membership space contains rather complex hierarchical information, which cannot be interpreted by classic shallow NMF-based approaches. Inspired by the unique feature representation learning capability of deep autoencoder, we propose a novel model, named Deep Autoencoder-like NMF (DANMF), for community detection. Similar to deep autoencoder, DANMF consists of an encoder component and a decoder component. This architecture empowers DANMF to learn the hierarchical mappings between the original network and the final community  assignment  with  implicit  low-to-high  level  hidden attributes of the original network learnt in the intermediate layers. Thus, DANMF should be better suited to the community detection task. Extensive experiments on benchmark datasets demonstrate that DANMF can achieve better performance than the state-of-the-art NMF-based community detection approaches.</p>
+Due to the fact much of today's data can be represented as graphs, there has been a demand for generalizing neural network models for graph data. One recent direction that has shown fruitful results, and therefore growing interest, is the usage of graph convolutional neural networks (GCNs). They have been shown to provide a significant improvement on a wide range of tasks in network analysis, one of which being node representation learning. The task of learning low-dimensional node representations has shown to increase performance on a plethora of other tasks from link prediction and node classification, to community detection and visualization. Simultaneously, signed networks (or graphs having both positive and negative links) have become ubiquitous with the growing popularity of social media. However, since previous GCN models have primarily focused on unsigned networks (or graphs consisting of only positive links), it is unclear how they could be applied to signed networks due to the challenges presented by negative links. The primary challenges are based on negative links having not only a different semantic meaning as compared to positive links, but their principles are inherently different and they form complex relations with positive links. Therefore we propose a dedicated and principled effort that utilizes balance theory to correctly aggregate and propagate the information across layers of a signed GCN model. We perform empirical experiments comparing our proposed signed GCN against state-of-the-art baselines for learning node representations in signed networks. More specifically, our experiments are performed on four real-world datasets for the classical link sign prediction problem that is commonly used as the benchmark for signed network embeddings algorithms. </p>
 
-This repository provides an implementation for DANMF as described in the paper:
+This repository provides an implementation for SGCN as described in the paper:
 
-> Deep Autoencoder-like Nonnegative Matrix Factorization for Community Detection.
-> Fanghua Ye, Chuan Chen, and Zibin Zheng.
-> CIKM, 2018.
-> [[Paper]](https://smartyfh.com/Documents/18DANMF.pdf)
+> Signed Graph Convolutional Network.
+> Tyler Derr, Yao Ma, and Jiliang Tang
+> ICDM, 2018.
+> [[Paper]](https://arxiv.org/abs/1808.06354)
 
 
 ### Requirements
@@ -35,6 +35,7 @@ texttable         1.5.0
 scipy             1.1.0
 argparse          1.1.0
 sklearn           0.20.0
+
 ```
 ### Datasets
 
