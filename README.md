@@ -65,34 +65,29 @@ Learning of the embedding is handled by the `src/main.py` script which provides 
 
 ### Examples
 
-The following commands learn a graph embedding and write the embedding to disk. The node representations are ordered by the ID. The layer sizes are always set manually.
+The following commands learn a node embedding, regression weights and write the embedding to disk. The node representations are ordered by the ID. The layer sizes can be set manually.
 
-
-Creating an SGCN embedding of the default dataset with a 128-64 architecture. Saving the embedding at the default path.
+Creating an SGCN embedding of the default dataset. Saving the embedding, regression weights and logs at default paths.
 ```
-python src/main.py --layers 128 64
+python src/main.py
 ```
 <p align="center">
 <img style="float: center;" src="sgcn_example.jpg">
 </p>
 
-Creating a DANMF embedding of the default dataset with a 96-8 architecture and calculationg the loss.
+Creating an SGCN model of the default dataset with a 96-64-32 architecture.
 ```
-python src/main.py --layers 96 8 --calculate-loss
+python src/main.py --layers 96 64 32
 ```
-Creating a single layer DANMF embedding with 32 factors.
+Creating a single layer SGCN model with 32 factors.
 ```
 python src/main.py --layers 32
 ```
-Creating an embedding with some custom cluster number in the bottleneck layer.
+Creating an embedding with some custom learning rate and epoch number.
 ```
-python src/main.py --layers 128 64 7
+python src/main.py --learning-rate 0.001 --epochs 200
 ```
-Creating an embedding of the default dataset with a 32-8 architecture and sklearn layer pre-training.
-```
-python src/main.py --layers 32 4 --pre-training-method sklearn
-```
-Creating an embedding of another dataset with features present and `Erdos-Renyi` graph. Saving the weight output and logs in a custom folder.
+Creating an embedding of another dataset with features present a signed `Erdos-Renyi` graph. Saving the weight output and logs in a custom folder.
 ```
 python src/main.py --general-features --edge-path input/erdos_renyi_edges.csv --features-path input/erdos_renyi_features.csv --embedding-path output/embedding/erdos_renyi.csv --regression-weights-path output/weights/erdos_renyi.csv --log-path logs/erdos_renyi.json
 ```
