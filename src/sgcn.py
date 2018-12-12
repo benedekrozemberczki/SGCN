@@ -1,23 +1,22 @@
 import json
+import time
 import torch
 import random
-import pandas as pd
 import numpy as np
+import pandas as pd
 from tqdm import trange
-from scipy import sparse
 import torch.nn.init as init
-import torch.nn.functional as F
 from torch.nn import Parameter
+import torch.nn.functional as F
+from utils import calculate_auc, setup_features
 from torch_geometric.nn import SAGEConv
-from sklearn.decomposition import TruncatedSVD
-from utils import calculate_auc
 from sklearn.model_selection import train_test_split
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
     """
     Signed Graph Convolutional Network Class.
-    For details see:
-
+    For details see: Signed Graph Convolutional Network. Tyler Derr, Yao Ma, and Jiliang Tang ICDM, 2018.
+    https://arxiv.org/abs/1808.06354
     """
     def __init__(self, device, args, X):
         super(SignedGraphConvolutionalNetwork, self).__init__()
@@ -31,25 +30,24 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         torch.manual_seed(self.args.seed)
         self.device = device
         self.X = X
+        self.setup_layers()
+
+    def setup_layers(self):
+        """
+        Adding Base Layers, Deep Signed GraphSAGE layers and Regression Parameters if the model is not a single layer model.
+        """
         self.nodes = range(self.X.shape[0])
         self.neurons = self.args.layers
         self.layers = len(self.neurons)
         self.positive_base_aggregator = SAGEConv(self.X.shape[1], self.neurons[0]).to(self.device)
         self.negative_base_aggregator = SAGEConv(self.X.shape[1], self.neurons[0]).to(self.device)
-        if self.layers > 1:
-            self.setup_additional_layers()
-        self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
-        init.xavier_normal_(self.regression_weights)
-
-    def setup_additional_layers(self):
-        """
-        Adding Deep Signed GraphSAGE layers if the model is not a single layer model.
-        """
         self.positive_aggregators = []
         self.negative_aggregators = []
         for i in range(1,self.layers):
             self.positive_aggregators.append(SAGEConv(2*self.neurons[i-1], self.neurons[i]).to(self.device))
             self.negative_aggregators.append(SAGEConv(2*self.neurons[i-1], self.neurons[i]).to(self.device))
+        self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
+        init.xavier_normal_(self.regression_weights)
  
 
     def calculate_regression_loss(self,z, target):
@@ -110,23 +108,6 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         loss_term = term.mean()
         return loss_term
 
-    def calculate_regularization_loss(self):
-        """
-        Calculate the regularization of model weights.
-        1. Base positive and negative SAGE embedding weights.
-        2. Regression weights.
-        3. Deep SAGE weights if the number of layers > 1.
-        :return regul_loss: regularization loss.
-        """
-        regul_base_pos = torch.norm(self.positive_base_aggregator.weight,2,1,True).mean()
-        regul_base_neg = torch.norm(self.negative_base_aggregator.weight,2,1,True).mean()
-        regul_reg = torch.norm(self.regression_weights,2,1,True).mean()
-        regularization_loss = regul_base_pos + regul_base_neg + regul_reg
-        for i in range(1,self.layers):
-            regularization_loss = regularization_loss + torch.norm(self.positive_aggregators[i-1].weight,2,1,True).mean()
-            regularization_loss = regularization_loss + torch.norm(self.negative_aggregators[i-1].weight,2,1,True).mean()
-        return regularization_loss
-
     def calculate_loss_function(self, z, positive_edges, negative_edges, target):
         """
         Calculating the embedding losses, regression loss and weight regularization loss.
@@ -139,8 +120,7 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         loss_term_1 = self.calculate_positive_embedding_loss(z, positive_edges)
         loss_term_2 = self.calculate_negative_embedding_loss(z, negative_edges)
         regression_loss, self.predictions = self.calculate_regression_loss(z,target)
-        regularization_loss = self.calculate_regularization_loss()
-        loss_term = regression_loss+self.args.lamb*(loss_term_1+loss_term_2)+self.args.gamma*regularization_loss
+        loss_term = regression_loss+self.args.lamb*(loss_term_1+loss_term_2)
         return loss_term
 
     def forward(self, positive_edges, negative_edges, target):
@@ -184,53 +164,19 @@ class SignedGCNTrainer(object):
         self.logs = {}
         self.logs["parameters"] =  vars(self.args)
         self.logs["performance"] = [["Epoch","AUC","F1"]]
-        self.logs["losses"] = []
-        self.logs["training_time"] = []
+        self.logs["training_time"] = [["Epoch","Seconds"]]
 
-    def setup_features(self):
-        
-        self.p_edges = self.positive_edges + [[edge[1],edge[0]] for edge in self.positive_edges]
-        self.n_edges = self.negative_edges + [[edge[1],edge[0]] for edge in self.negative_edges]
-        self.train_edges = self.p_edges + self.n_edges
-        self.index_1 = [edge[0] for edge in self.train_edges]
-        self.index_2 = [edge[1] for edge in self.train_edges]
-        self.values = [1]*len(self.p_edges) + [-1]*len(self.n_edges)
-        shaping = (self.node_count,self.node_count)
-        self.signed_A = sparse.csr_matrix(sparse.coo_matrix((self.values,(self.index_1,self.index_2)),shape=shaping,dtype=np.float32))
-        svd = TruncatedSVD(n_components=self.args.reduction_dimensions, n_iter=self.args.reduction_iterations, random_state=self.args.seed)
-        svd.fit(self.signed_A)
-        return svd.components_.T
 
     def setup_dataset(self):
         self.positive_edges, self.test_positive_edges = train_test_split(self.edges["positive_edges"], test_size = self.args.test_size)
         self.negative_edges, self.test_negative_edges = train_test_split(self.edges["negative_edges"], test_size = self.args.test_size)
-        ecount = len(self.positive_edges + self.negative_edges)
-        self.node_count = self.edges["ncount"]
-        self.X = self.setup_features()
+        self.ecount = len(self.positive_edges + self.negative_edges)
+        self.X = setup_features(self.args, self.positive_edges, self.negative_edges, self.edges["ncount"])
         self.positive_edges = torch.from_numpy(np.array(self.positive_edges, dtype=np.int64).T).type(torch.long).to(self.device)
         self.negative_edges = torch.from_numpy(np.array(self.negative_edges, dtype=np.int64).T).type(torch.long).to(self.device)
-
-        self.y = np.array([0 if i< int(ecount/2) else 1 for i in range(ecount)] +[2]*(ecount*2))
+        self.y = np.array([0 if i< int(self.ecount/2) else 1 for i in range(self.ecount)] +[2]*(self.ecount*2))
         self.y = torch.from_numpy(self.y).type(torch.LongTensor).to(self.device)
-
         self.X = torch.from_numpy(self.X).float().to(self.device)
-
-    def create_and_train_model(self):
-        """
-        """
-        print("\nTraining started.\n")
-        self.model = SignedGraphConvolutionalNetwork(self.device, self.args, self.X).to(self.device)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=5e-4)
-        self.model.train()
-        self.epochs = trange(self.args.epochs, desc='Loss')
-
-        for epoch in self.epochs:
-            self.optimizer.zero_grad()
-            loss, _ = self.model(self.positive_edges, self.negative_edges, self.y)
-            loss.backward()
-            self.epochs.set_description('SGCN (Loss=%g)' % round(loss.item(),4))
-            self.optimizer.step()
-            self.score_model(epoch)
 
     def score_model(self, epoch):
         """
@@ -243,24 +189,42 @@ class SignedGCNTrainer(object):
         scores = torch.mm(torch.cat((test_positive_z, test_negative_z),0), self.model.regression_weights.to(self.device))
         probability_scores = torch.exp(F.softmax(scores, dim=1))
         predictions = probability_scores[:,0]/probability_scores[:,0:2].sum(1)
-        predictions = predictions.detach().numpy()
+        predictions = predictions.cpu().detach().numpy()
         targets = [0]*len(self.test_positive_edges) + [1]*len(self.test_negative_edges)
         auc, f1 = calculate_auc(targets, predictions, self.edges)
         self.logs["performance"].append([epoch+1, auc, f1])
-        
 
+    def create_and_train_model(self):
+        """
+        """
+        print("\nTraining started.\n")
+        self.model = SignedGraphConvolutionalNetwork(self.device, self.args, self.X).to(self.device)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
+        self.model.train()
+        self.epochs = trange(self.args.epochs, desc='Loss')
+        for epoch in self.epochs:
+            start_time = time.time()
+            self.optimizer.zero_grad()
+            loss, _ = self.model(self.positive_edges, self.negative_edges, self.y)
+            loss.backward()
+            self.epochs.set_description('SGCN (Loss=%g)' % round(loss.item(),4))
+            self.optimizer.step()
+            self.logs["training_time"].append([epoch+1,time.time()-start_time])
+            self.score_model(epoch)
+
+        
     def save_model(self):
         """
 
         """
-        print("\nEmbedding being saved.\n")
-        self.train_z = self.train_z.detach().numpy()
+        print("\nEmbedding is saved.\n")
+        self.train_z = self.train_z.cpu().detach().numpy()
         embedding_header = ["id"] + ["x_" + str(x) for x in range(self.train_z.shape[1])]
         self.train_z = np.concatenate([np.array(range(self.train_z.shape[0])).reshape(-1,1),self.train_z],axis=1)
         self.train_z = pd.DataFrame(self.train_z, columns = embedding_header)
         self.train_z.to_csv(self.args.embedding_path, index = None)
-        print("\nWeights being saved.\n")
-        self.regression_weights = self.model.regression_weights.detach().numpy().T
+        print("\nRegression weights are saved.\n")
+        self.regression_weights = self.model.regression_weights.cpu().detach().numpy().T
         regression_header = ["x_" + str(x) for x in range(self.regression_weights.shape[1])]
         self.regression_weights = pd.DataFrame(self.regression_weights, columns = regression_header)
         self.regression_weights.to_csv(self.args.regression_weights_path, index = None)     

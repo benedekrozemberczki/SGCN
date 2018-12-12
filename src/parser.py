@@ -15,6 +15,11 @@ def parameter_parser():
                         default = './input/bitcoin_otc.csv',
 	                help = 'Edge list csv.')
 
+    parser.add_argument('--features-path',
+                        nargs = '?',
+                        default = './input/bitcoin_otc.csv',
+	                help = 'Edge list csv.')
+
     parser.add_argument('--embedding-path',
                         nargs = '?',
                         default = './output/embedding/bitcoin_otc_sgcn.csv',
@@ -55,11 +60,6 @@ def parameter_parser():
                         default = 1.0,
 	                help = 'Embedding regularization parameter. Default is 1.0.')
 
-    parser.add_argument('--gamma',
-                        type = float,
-                        default = 0.001,
-	                help = 'Weight regularization parameter. Default is 0.001.')
-
     parser.add_argument('--test-size',
                         type = float,
                         default = 0.2,
@@ -79,6 +79,17 @@ def parameter_parser():
                         nargs='+',
                         type=int,
                         help = 'Layer dimensions separated by space. E.g. 128 64 32.')
+
+    parser.add_argument('--spectral-features',
+                        dest='spectral_features',
+                        action='store_true')
+
+    parser.add_argument('--general-features',
+                        dest='spectral_features',
+                        action='store_false')
+
+    parser.set_defaults(spectral_features=True)
+
 	
     parser.set_defaults(layers=[64, 32])
     

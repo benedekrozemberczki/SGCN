@@ -1,9 +1,11 @@
-import pandas as pd
 import json
+import numpy as np
+import pandas as pd
 import networkx as nx
+from scipy import sparse
 from texttable import Texttable
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score, f1_score
+from sklearn.decomposition import TruncatedSVD
 
 def read_graph(args):
     """
@@ -41,6 +43,8 @@ def calculate_auc(targets, predictions, edges):
 
 def score_printer(logs):
     """
+    :param logs:
+
     """
     t = Texttable() 
     t.add_rows([per for i, per in enumerate(logs["performance"]) if i % 10 == 0])
@@ -48,7 +52,34 @@ def score_printer(logs):
 
 def save_logs(args, logs):
     with open(args.log_path,"w") as f:
-            json.dump(logs,f)  
+            json.dump(logs,f)
+
+def setup_features(args, positive_edges, negative_edges, node_count):
+    if args.spectral_features:
+        X = create_spectral_features(args, positive_edges, negative_edges, node_count)
+    else:
+        X = create_general_features(args)
+    return X
+
+def create_general_features(args):
+    features = np.array(pd.read_csv(args.features_path))
+    return features 
+
+def create_spectral_features(args, positive_edges, negative_edges, node_count):
+    """
+
+    """
+    p_edges = positive_edges + [[edge[1],edge[0]] for edge in positive_edges]
+    n_edges = negative_edges + [[edge[1],edge[0]] for edge in negative_edges]
+    train_edges = p_edges + n_edges
+    index_1 = [edge[0] for edge in train_edges]
+    index_2 = [edge[1] for edge in train_edges]
+    values = [1]*len(p_edges) + [-1]*len(n_edges)
+    shaping = (node_count, node_count)
+    signed_A = sparse.csr_matrix(sparse.coo_matrix((values,(index_1,index_2)),shape=shaping,dtype=np.float32))
+    svd = TruncatedSVD(n_components=args.reduction_dimensions, n_iter=args.reduction_iterations, random_state=args.seed)
+    svd.fit(signed_A)
+    return svd.components_.T
 
     
 
