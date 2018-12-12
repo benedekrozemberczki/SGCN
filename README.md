@@ -81,7 +81,7 @@ Creating a DANMF embedding of the default dataset with a 128-64-32-16 architectu
 python src/main.py --layers 128 64 32 16
 ```
 
-<div style="text-align:center"><img src ="sgcn_example.jpg" ,width=720/></div>
+<div style="float: center"><img src ="sgcn_example.jpg" ,width=720/></div>
 
 Creating a DANMF embedding of the default dataset with a 96-8 architecture and calculationg the loss.
 ```
