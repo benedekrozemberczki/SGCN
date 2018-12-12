@@ -92,7 +92,7 @@ Creating an embedding of the default dataset with a 32-8 architecture and sklear
 ```
 python src/main.py --layers 32 4 --pre-training-method sklearn
 ```
-Creating an embedding of another dataset the `Wikipedia Chameleons`. Saving the output in a custom folder.
+Creating an embedding of another dataset with features present and `Erdos-Renyi` graph. Saving the weight output and logs in a custom folder.
 ```
-python src/main.py --layers 32 8 --edge-path input/chameleon_edges.csv --output-path output/chameleon_danmf.csv --membership-path output/chameleon_membership.json
+python src/main.py --general-features --edge-path input/erdos_renyi_edges.csv --features-path input/erdos_renyi_features.csv --embedding-path output/embedding/erdos_renyi.csv --regression-weights-path output/weights/erdos_renyi.csv --log-path logs/erdos_renyi.json
 ```
