@@ -100,7 +100,7 @@ Creating an SGCN model of the default dataset with a 96-64-32 architecture.
 ```
 python src/main.py --layers 96 64 32
 ```
-Creating a single layer SGCN model with 32 factors.
+Creating a single layer SGCN model with 32 features.
 ```
 python src/main.py --layers 32
 ```
