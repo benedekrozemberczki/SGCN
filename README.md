@@ -33,6 +33,7 @@ torchvision        0.2.1
 ### Datasets
 
 The code takes an input graph in a csv file. Every row indicates an edge between two nodes separated by a comma. The first row is a header. Nodes should be indexed starting with 0. Sample graphs for the `Bitcoin Alpha`  and `Bitcoin OTC` graphs are included in the  `input/` directory. The structure of the edge dataset is the following:
+
 | **NODE ID 1**| **NODE ID 2** | **Sign** | 
 | --- | --- | --- |
 | 0 | 3 |-1 |
@@ -43,6 +44,7 @@ The code takes an input graph in a csv file. Every row indicates an edge between
 | n | 9 |-1 |
 
 An attributed dataset for an `Erdos-Renyi` graph is also included in the input folder. **The node features are sorted by ID increasing**. The structure of the features csv has to be the following:
+
 | **Feature 1** | **Feature 2** | **Feature 3** | **Feature d** |
 | --- | --- | --- |--- |
 |  3 |0 |1.37 |1 |
