@@ -32,7 +32,26 @@ torchvision        0.2.1
 ```
 ### Datasets
 
-The code takes an input graph in a csv file. Every row indicates an edge between two nodes separated by a comma. The first row is a header. Nodes should be indexed starting with 0. Sample graphs for the `Twitch Brasilians` ,`Wikipedia Chameleons` and `Wikipedia Giraffes` are included in the  `input/` directory. 
+The code takes an input graph in a csv file. Every row indicates an edge between two nodes separated by a comma. The first row is a header. Nodes should be indexed starting with 0. Sample graphs for the `Bitcoin Alpha`  and `Bitcoin OTC` graphs are included in the  `input/` directory. The structure of the edge datasets is the following:
+| **NODE ID 1**| **NODE ID 2** | **Sign** | 
+| --- | --- | --- |
+| 0 | 3 |-1 |
+| 1 | 1 |1 |
+| 2 | 2 |1 |
+| 3 | 1 |-1 |
+| ... | ... |... |
+| n | 9 |-1 |
+
+
+An attributed dataset for an `Erdos-Renyi` graph is also included in the input folder. The node features are sorted by ID. The structure of the features csv is the following:
+| **NODE ID**| **Feature 1** | **Feature 2** | **Feature 3** | **Feature 4** |
+| --- | --- | --- | --- |--- |
+| 0 | 3 |0 |1.37 |1 |
+| 1 | 1 |1 |2.54 |-11 |
+| 2 | 2 |0 |1.08 |-12 |
+| 3 | 1 |1 |1.22 |-4 |
+| ... | ... |... |... |... |
+| n | 5 |0 |2.47 |21 |
 
 ### Options
 
@@ -41,21 +60,27 @@ Learning of the embedding is handled by the `src/main.py` script which provides 
 #### Input and output options
 
 ```
-  --edge-path         STR    Input graph path.       Default is `input/ptbr_edges.csv`.
-  --membership-path   STR    Membership path.        Default is `output/ptbr_membership.json`.
-  --output-path       STR    Embedding path.         Default is `output/ptbr_danmf.csv`.
+  --edge-path                STR    Input graph path.          Default is `input/bitcoin_otc.csv`.
+  --features-path            STR    Membership path.           Default is `input/bitcoin_otc.csv`.
+  --embedding-path           STR    Embedding path.            Default is `output/embedding/bitcoin_otc_sgcn.csv`.
+  --regression-weights-path  STR    Regression weights path.   Default is `output/weights/bitcoin_otc_sgcn.csv`.
+  --log-path                 STR    Log path.                  Default is `logs/bitcoin_otc_logs.json`.  
 ```
 
 #### Model options
 
 ```
-  --pre-training-method   STR         Layer pre-training method.            Default is `shallow`. 
-  --iterations            INT         Number of epochs.                     Default is 100.
-  --pre-iterations        INT         Layer-wise epochs.                    Default is 100.
-  --seed                  INT         Random seed value.                    Default is 42.
-  --lamb                  FLOAT       Regularization parameter.             Default is 0.01.
-  --layers                LST         Layer sizes in autoencoder model.     Default is [32, 8]
-  --calculate-loss        BOOL        Loss calculation for the model.       Default is False.  
+  --epochs                INT         Number of SGCN training epochs.      Default is 50. 
+  --reduction-iterations  INT         Number of SVD epochs.                Default is 128.
+  --reduction-dimensions  INT         SVD dimensions.                      Default is 30.
+  --seed                  INT         Random seed value.                   Default is 42.
+  --lamb                  FLOAT       Embedding regularization parameter.  Default is 1.0.
+  --test-size             FLOAT       Test ratio..                         Default is False.  
+  --learning-rate         FLOAT       Learning rate.                       Default is 0.001.  
+  --weight-decay          FLOAT       Weight decay.                        Default is 10^-5. 
+  --layers                LST         Layer sizes in model.                Default is [64, 32].
+  --spectral-features     BOOL        Layer sizes in autoencoder model.    Default is True
+  --general-features      BOOL        Loss calculation for the model.      Sets spectral features to False.  
 ```
 
 ### Examples
