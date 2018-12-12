@@ -75,10 +75,14 @@ Learning of the embedding is handled by the `src/main.py` script which provides 
 
 The following commands learn a graph embedding and write the embedding to disk. The node representations are ordered by the ID. The layer sizes are always set manually.
 
+
 Creating a DANMF embedding of the default dataset with a 128-64-32-16 architecture. Saving the embedding at the default path.
 ```
 python src/main.py --layers 128 64 32 16
 ```
+
+<div style="text-align:center"><img src ="sgcn_example.jpg" ,width=720/></div>
+
 Creating a DANMF embedding of the default dataset with a 96-8 architecture and calculationg the loss.
 ```
 python src/main.py --layers 96 8 --calculate-loss
