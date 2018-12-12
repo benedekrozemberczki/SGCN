@@ -4,7 +4,7 @@ from sgcn import SignedGCNTrainer
 
 def main():
     """
-    Parsing command lines, creating target matrix, fitting  an SGCN, predicting edge signs and saving the embedding.
+    Parsing command lines, creating target matrix, fitting an SGCN, predicting edge signs, and saving the embedding.
     """
     args = parameter_parser()
     tab_printer(args)
@@ -12,9 +12,10 @@ def main():
     trainer = SignedGCNTrainer(args,edges)
     trainer.setup_dataset()
     trainer.create_and_train_model()
-    trainer.save_model()
-    score_printer(trainer.logs)
-    save_logs(args, trainer.logs)
+    if args.test_size>0:
+        trainer.save_model()
+        score_printer(trainer.logs)
+        save_logs(args, trainer.logs)
 
 if __name__ =="__main__":
     main()

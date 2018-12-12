@@ -210,7 +210,8 @@ class SignedGCNTrainer(object):
             self.epochs.set_description('SGCN (Loss=%g)' % round(loss.item(),4))
             self.optimizer.step()
             self.logs["training_time"].append([epoch+1,time.time()-start_time])
-            self.score_model(epoch)
+            if self.args.test_size >0:
+                self.score_model(epoch)
 
         
     def save_model(self):
