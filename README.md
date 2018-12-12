@@ -1,10 +1,5 @@
 SGCN
 ============================================
-- [ ] **Write README**
-- [ ] **Post on Reddit.**
-- [ ] **Add to graph based literature webpage.**
-- [ ] **Add to Chihmings collections as it is node level.**
-
 A PyTorch implementation of "Signed Graph Convolutional Network" (ICDM 2018).
 
 <div style="text-align:center"><img src ="sgcn.jpg" ,width=720/></div>
