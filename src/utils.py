@@ -108,4 +108,5 @@ def create_spectral_features(args, positive_edges, negative_edges, node_count):
     signed_A = sparse.csr_matrix(sparse.coo_matrix((values,(index_1,index_2)),shape=shaping,dtype=np.float32))
     svd = TruncatedSVD(n_components=args.reduction_dimensions, n_iter=args.reduction_iterations, random_state=args.seed)
     svd.fit(signed_A)
-    return svd.components_.T
+    X = svd.components_.T
+    return X
