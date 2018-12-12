@@ -34,6 +34,12 @@ def tab_printer(args):
 
 def calculate_auc(targets, predictions, edges):
     """
+    Calculate performance measures on test dataset.
+    :param targets: Target vector to predict.
+    :param predictions: Predictions vector. 
+    :param edges: Edges dictionary with number of edges etc.
+    :return auc: AUC value.
+    :return f1: F1-score.
     """
     neg_ratio = len(edges["negative_edges"])/edges["ecount"]
     targets = [0 if target == 1 else 1 for target in targets]
@@ -43,18 +49,31 @@ def calculate_auc(targets, predictions, edges):
 
 def score_printer(logs):
     """
-    :param logs:
-
+    Print the performance for every 10th epoch on the test dataset.
+    :param logs: Log dictionary.
     """
     t = Texttable() 
     t.add_rows([per for i, per in enumerate(logs["performance"]) if i % 10 == 0])
     print(t.draw())
 
 def save_logs(args, logs):
+    """
+    Save the logs at the path.
+    :param args: Arguments objects.
+    :param logs: Log dictionary.
+    """
     with open(args.log_path,"w") as f:
             json.dump(logs,f)
 
 def setup_features(args, positive_edges, negative_edges, node_count):
+    """
+    Setting up the node features as a numpy array.
+    :param args: Arguments object.
+    :param positive_edges: Positive edges list.
+    :param negative_edges: Negative edges list.
+    :param node_count: Number of nodes.
+    :return X: Node features.
+    """
     if args.spectral_features:
         X = create_spectral_features(args, positive_edges, negative_edges, node_count)
     else:
@@ -62,12 +81,22 @@ def setup_features(args, positive_edges, negative_edges, node_count):
     return X
 
 def create_general_features(args):
-    features = np.array(pd.read_csv(args.features_path))
-    return features 
+    """
+    Reading features using the path.
+    :param args: Arguments object.
+    :return X: Node features.
+    """
+    X = np.array(pd.read_csv(args.features_path))
+    return X
 
 def create_spectral_features(args, positive_edges, negative_edges, node_count):
     """
-
+    Creating spectral node features using the train dataset edges.
+    :param args: Arguments object.
+    :param positive_edges: Positive edges list.
+    :param negative_edges: Negative edges list.
+    :param node_count: Number of nodes.
+    :return X: Node features.
     """
     p_edges = positive_edges + [[edge[1],edge[0]] for edge in positive_edges]
     n_edges = negative_edges + [[edge[1],edge[0]] for edge in negative_edges]
@@ -80,6 +109,3 @@ def create_spectral_features(args, positive_edges, negative_edges, node_count):
     svd = TruncatedSVD(n_components=args.reduction_dimensions, n_iter=args.reduction_iterations, random_state=args.seed)
     svd.fit(signed_A)
     return svd.components_.T
-
-    
-
