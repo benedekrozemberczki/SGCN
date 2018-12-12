@@ -43,7 +43,7 @@ The code takes an input graph in a csv file. Every row indicates an edge between
 | ... | ... |... |
 | n | 9 |-1 |
 
-An attributed dataset for an `Erdos-Renyi` graph is also included in the input folder. **The node features are sorted by ID increasing**. The structure of the features csv has to be the following:
+An attributed dataset for an `Erdos-Renyi` graph is also included in the input folder. **The node feature dataset rows are sorted by ID increasing**. The structure of the features csv has to be the following:
 
 | **Feature 1** | **Feature 2** | **Feature 3** |...| **Feature d** |
 | --- | --- | --- | --- |--- |
