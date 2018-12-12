@@ -1,7 +1,5 @@
 SGCN
 ============================================
-
-- [ ] **Log time.**
 - [ ] **Complete refactor to make it nice.**
 - [ ] **Data read from disk.**
 - [ ] **Write README**
