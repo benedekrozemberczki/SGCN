@@ -67,7 +67,7 @@ Creating an SGCN embedding of the default dataset. Saving the embedding, regress
 python src/main.py
 ```
 <p align="center">
-<img style="float: center;" src="sgcn_example.jpg">
+<img style="float: center;" src="sgcn_run_example.jpg">
 </p>
 
 Creating an SGCN model of the default dataset with a 96-64-32 architecture.
