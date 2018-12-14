@@ -7,6 +7,9 @@ from torch_geometric.utils import remove_self_loops, add_self_loops
 
 def uniform(size, tensor):
     """
+    Uniform weight initialization.
+    :param size: Size of the tensor.
+    :param tensor: Tensor initialized.
     """
     stdv = 1.0 / math.sqrt(size)
     if tensor is not None:
@@ -14,6 +17,11 @@ def uniform(size, tensor):
 
 class SignedSAGEConvolution(torch.nn.Module):
     """
+    Abstract Signed SAGE convolution class.
+    :param in_channels: Number of features.
+    :param out_channels: Number of filters.
+    :param norm_embed: Normalize embedding -- boolean.
+    :param bias: Add bias or no.
     """
     def __init__(self,
                  in_channels,
@@ -37,21 +45,32 @@ class SignedSAGEConvolution(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
+        """
+        Initialize parameters.
+        """
         size = self.weight.size(0)
         uniform(size, self.weight)
         uniform(size, self.bias)
 
     def __repr__(self):
+        """
+        Create formal string representation.
+        """
         return '{}({}, {})'.format(self.__class__.__name__, self.in_channels,
                                    self.out_channels)
 
 class SignedSAGEConvolutionBase(SignedSAGEConvolution):
     """
+    Base Signed SAGE class for the first layer of the model.
     """
     def forward(self, x, edge_index):
+        """
+        Forward propagation pass with features an indices.
+        :param x: Feature matrix.
+        :param edge_index: Indices.
+        """
         edge_index, _ = remove_self_loops(edge_index, None)
         edge_index = add_self_loops(edge_index, num_nodes=x.size(0))
-
         row, col = edge_index
 
         if self.norm:
@@ -59,22 +78,28 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
         else:
             out = scatter_add(x[col], row, dim=0, dim_size=x.size(0))
 
-
         out = torch.cat((out,x),1)
         out = torch.matmul(out, self.weight)
+        
         if self.bias is not None:
             out = out + self.bias
-
         if self.norm_embed:
             out = F.normalize(out, p=2, dim=-1)
-
+            
         return out
 
 class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
     """
+    Deep Signed SAGE class for multi-layer models.
     """
     def forward(self, x_1, x_2, edge_index_pos, edge_index_neg):
-
+        """
+        Forward propagation pass with features an indices.
+        :param x_1: Features for left hand side vertices.
+        :param x_2: Features for right hand side vertices.
+        :param edge_index_pos: Positive indices.
+        :param edge_index_neg: Negative indices.
+        """
         edge_index_pos, _ = remove_self_loops(edge_index_pos, None)
         edge_index_pos = add_self_loops(edge_index_pos, num_nodes=x_1.size(0))
         edge_index_neg, _ = remove_self_loops(edge_index_neg, None)
@@ -89,7 +114,7 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
         else:
             out_1 = scatter_add(x_1[col_pos], row_pos, dim=0, dim_size=x_1.size(0))
             out_2 = scatter_add(x_2[col_neg], row_neg, dim=0, dim_size=x_2.size(0))
-
+            
         out = torch.cat((out_1,out_2,x_1),1)
         out = torch.matmul(out, self.weight)
         if self.bias is not None:
