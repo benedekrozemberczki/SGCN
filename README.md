@@ -71,7 +71,7 @@ Learning of the embedding is handled by the `src/main.py` script which provides 
 #### Model options
 
 ```
-  --epochs                INT         Number of SGCN training epochs.      Default is 50. 
+  --epochs                INT         Number of SGCN training epochs.      Default is 100. 
   --reduction-iterations  INT         Number of SVD epochs.                Default is 128.
   --reduction-dimensions  INT         SVD dimensions.                      Default is 30.
   --seed                  INT         Random seed value.                   Default is 42.
