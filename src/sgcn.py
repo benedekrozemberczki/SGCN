@@ -9,7 +9,7 @@ import torch.nn.init as init
 from torch.nn import Parameter
 import torch.nn.functional as F
 from utils import calculate_auc, setup_features
-from torch_geometric.nn import SAGEConv
+from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 from sklearn.model_selection import train_test_split
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
@@ -39,13 +39,13 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         self.nodes = range(self.X.shape[0])
         self.neurons = self.args.layers
         self.layers = len(self.neurons)
-        self.positive_base_aggregator = SAGEConv(self.X.shape[1], self.neurons[0]).to(self.device)
-        self.negative_base_aggregator = SAGEConv(self.X.shape[1], self.neurons[0]).to(self.device)
+        self.positive_base_aggregator = SignedSAGEConvolutionBase(self.X.shape[1]*2, self.neurons[0]).to(self.device)
+        self.negative_base_aggregator = SignedSAGEConvolutionBase(self.X.shape[1]*2, self.neurons[0]).to(self.device)
         self.positive_aggregators = []
         self.negative_aggregators = []
         for i in range(1,self.layers):
-            self.positive_aggregators.append(SAGEConv(2*self.neurons[i-1], self.neurons[i]).to(self.device))
-            self.negative_aggregators.append(SAGEConv(2*self.neurons[i-1], self.neurons[i]).to(self.device))
+            self.positive_aggregators.append(SignedSAGEConvolutionDeep(3*self.neurons[i-1], self.neurons[i]).to(self.device))
+            self.negative_aggregators.append(SignedSAGEConvolutionDeep(3*self.neurons[i-1], self.neurons[i]).to(self.device))
         self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
         init.xavier_normal_(self.regression_weights)
  
@@ -136,8 +136,8 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         self.h_pos.append(torch.tanh(self.positive_base_aggregator(self.X, positive_edges)))
         self.h_neg.append(torch.tanh(self.negative_base_aggregator(self.X, negative_edges)))
         for i in range(1,self.layers):
-            self.h_pos.append(torch.tanh(self.positive_aggregators[i-1](torch.cat((self.h_pos[i-1],self.h_neg[i-1]), 1), positive_edges)))
-            self.h_neg.append(torch.tanh(self.negative_aggregators[i-1](torch.cat((self.h_neg[i-1],self.h_pos[i-1]), 1), negative_edges)))
+            self.h_pos.append(torch.tanh(self.positive_aggregators[i-1](self.h_pos[i-1],self.h_neg[i-1], positive_edges, negative_edges)))
+            self.h_neg.append(torch.tanh(self.negative_aggregators[i-1](self.h_neg[i-1],self.h_pos[i-1], positive_edges, negative_edges)))
         self.z = torch.cat((self.h_pos[-1], self.h_neg[-1]), 1)
         loss = self.calculate_loss_function(self.z, positive_edges, negative_edges, target)
         return loss, self.z
@@ -213,7 +213,6 @@ class SignedGCNTrainer(object):
             if self.args.test_size >0:
                 self.score_model(epoch)
 
-        
     def save_model(self):
         """
 
