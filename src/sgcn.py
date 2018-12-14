@@ -182,7 +182,7 @@ class SignedGCNTrainer(object):
 
     def score_model(self, epoch):
         """
-        Score the model on the training edges in each epoch.
+        Score the model on the test set edges in each epoch.
         :param epoch: Epoch number. 
         """
         loss, self.train_z = self.model(self.positive_edges, self.negative_edges, self.y)
