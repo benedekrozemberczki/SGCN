@@ -9,8 +9,8 @@ import torch.nn.init as init
 from torch.nn import Parameter
 import torch.nn.functional as F
 from utils import calculate_auc, setup_features
-from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 from sklearn.model_selection import train_test_split
+from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
     """
@@ -49,7 +49,6 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
         init.xavier_normal_(self.regression_weights)
  
-
     def calculate_regression_loss(self,z, target):
         """
         Calculating the regression loss for all pairs of nodes.
@@ -168,6 +167,9 @@ class SignedGCNTrainer(object):
 
 
     def setup_dataset(self):
+        """
+        Creating train and test split.
+        """
         self.positive_edges, self.test_positive_edges = train_test_split(self.edges["positive_edges"], test_size = self.args.test_size)
         self.negative_edges, self.test_negative_edges = train_test_split(self.edges["negative_edges"], test_size = self.args.test_size)
         self.ecount = len(self.positive_edges + self.negative_edges)
@@ -180,6 +182,8 @@ class SignedGCNTrainer(object):
 
     def score_model(self, epoch):
         """
+        Score the model on the training edges in each epoch.
+        :param epoch: Epoch number. 
         """
         loss, self.train_z = self.model(self.positive_edges, self.negative_edges, self.y)
         score_positive_edges = torch.from_numpy(np.array(self.test_positive_edges, dtype=np.int64).T).type(torch.long).to(self.device)
@@ -196,6 +200,7 @@ class SignedGCNTrainer(object):
 
     def create_and_train_model(self):
         """
+        Model training and scoring.
         """
         print("\nTraining started.\n")
         self.model = SignedGraphConvolutionalNetwork(self.device, self.args, self.X).to(self.device)
@@ -215,7 +220,7 @@ class SignedGCNTrainer(object):
 
     def save_model(self):
         """
-
+        Saving the embedding and model weights.
         """
         print("\nEmbedding is saved.\n")
         self.train_z = self.train_z.cpu().detach().numpy()
