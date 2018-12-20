@@ -47,8 +47,8 @@ def parameter_parser():
 
     parser.add_argument('--reduction-dimensions',
                         type = int,
-                        default = 128,
-	                help = 'Number of SVD feature extraction dimensions. Default is 128.')
+                        default = 64,
+	                help = 'Number of SVD feature extraction dimensions. Default is 64.')
 
     parser.add_argument('--seed',
                         type = int,
@@ -78,7 +78,7 @@ def parameter_parser():
     parser.add_argument('--layers',
                         nargs='+',
                         type=int,
-                        help = 'Layer dimensions separated by space. E.g. 128 64 32.')
+                        help = 'Layer dimensions separated by space. E.g. 32 32.')
 
     parser.add_argument('--spectral-features',
                         dest='spectral_features',
@@ -91,6 +91,6 @@ def parameter_parser():
     parser.set_defaults(spectral_features=True)
 
 	
-    parser.set_defaults(layers=[64, 32])
+    parser.set_defaults(layers=[32, 32])
     
     return parser.parse_args()
