@@ -9,7 +9,6 @@ def parameter_parser():
 
     parser = argparse.ArgumentParser(description = "Run SGCN.")
 
-
     parser.add_argument('--edge-path',
                         nargs = '?',
                         default = './input/bitcoin_otc.csv',
@@ -81,16 +80,15 @@ def parameter_parser():
                         help = 'Layer dimensions separated by space. E.g. 32 32.')
 
     parser.add_argument('--spectral-features',
-                        dest='spectral_features',
-                        action='store_true')
+                        dest = 'spectral_features',
+                        action = 'store_true')
 
     parser.add_argument('--general-features',
-                        dest='spectral_features',
-                        action='store_false')
+                        dest = 'spectral_features',
+                        action = 'store_false')
 
-    parser.set_defaults(spectral_features=True)
+    parser.set_defaults(spectral_features = True)
 
-	
-    parser.set_defaults(layers=[32, 32])
+    parser.set_defaults(layers = [32, 32])
     
     return parser.parse_args()
