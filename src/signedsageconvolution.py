@@ -40,7 +40,7 @@ class SignedSAGEConvolution(torch.nn.Module):
         if bias:
             self.bias = Parameter(torch.Tensor(out_channels))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter("bias", None)
 
         self.reset_parameters()
 
@@ -56,8 +56,7 @@ class SignedSAGEConvolution(torch.nn.Module):
         """
         Create formal string representation.
         """
-        return '{}({}, {})'.format(self.__class__.__name__, self.in_channels,
-                                   self.out_channels)
+        return "{}({}, {})".format(self.__class__.__name__, self.in_channels, self.out_channels)
 
 class SignedSAGEConvolutionBase(SignedSAGEConvolution):
     """
@@ -85,7 +84,6 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
             out = out + self.bias
         if self.norm_embed:
             out = F.normalize(out, p=2, dim=-1)
-            
         return out
 
 class SignedSAGEConvolutionDeep(SignedSAGEConvolution):

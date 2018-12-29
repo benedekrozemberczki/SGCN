@@ -153,7 +153,7 @@ class SignedGCNTrainer(object):
         """
         self.args = args
         self.edges = edges 
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.setup_logs()
 
     def setup_logs(self):
@@ -206,13 +206,13 @@ class SignedGCNTrainer(object):
         self.model = SignedGraphConvolutionalNetwork(self.device, self.args, self.X).to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         self.model.train()
-        self.epochs = trange(self.args.epochs, desc='Loss')
+        self.epochs = trange(self.args.epochs, desc="Loss")
         for epoch in self.epochs:
             start_time = time.time()
             self.optimizer.zero_grad()
             loss, _ = self.model(self.positive_edges, self.negative_edges, self.y)
             loss.backward()
-            self.epochs.set_description('SGCN (Loss=%g)' % round(loss.item(),4))
+            self.epochs.set_description("SGCN (Loss=%g)" % round(loss.item(),4))
             self.optimizer.step()
             self.logs["training_time"].append([epoch+1,time.time()-start_time])
             if self.args.test_size >0:
