@@ -10,7 +10,7 @@ from torch.nn import Parameter
 import torch.nn.functional as F
 from utils import calculate_auc, setup_features
 from sklearn.model_selection import train_test_split
-from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
+from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep, ListModule
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
     """
@@ -46,6 +46,8 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         for i in range(1,self.layers):
             self.positive_aggregators.append(SignedSAGEConvolutionDeep(3*self.neurons[i-1], self.neurons[i]).to(self.device))
             self.negative_aggregators.append(SignedSAGEConvolutionDeep(3*self.neurons[i-1], self.neurons[i]).to(self.device))
+        self.positive_aggregators = ListModule(*self.positive_aggregators)
+        self.negative_aggregators = ListModule(*self.negative_aggregators)
         self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
         init.xavier_normal_(self.regression_weights)
  
