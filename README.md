@@ -56,7 +56,7 @@ An attributed dataset for an `Erdos-Renyi` graph is also included in the input f
 
 ### Options
 
-Learning of the embedding is handled by the `src/main.py` script which provides the following command line arguments.
+Learning an embedding is handled by the `src/main.py` script which provides the following command line arguments.
 
 #### Input and output options
 
@@ -76,7 +76,7 @@ Learning of the embedding is handled by the `src/main.py` script which provides 
   --reduction-dimensions  INT         SVD dimensions.                      Default is 30.
   --seed                  INT         Random seed value.                   Default is 42.
   --lamb                  FLOAT       Embedding regularization parameter.  Default is 1.0.
-  --test-size             FLOAT       Test ratio..                         Default is False.  
+  --test-size             FLOAT       Test ratio.                          Default is 0.2.  
   --learning-rate         FLOAT       Learning rate.                       Default is 0.001.  
   --weight-decay          FLOAT       Weight decay.                        Default is 10^-5. 
   --layers                LST         Layer sizes in model.                Default is [64, 32].
@@ -108,7 +108,7 @@ Creating a model with some custom learning rate and epoch number.
 ```
 python src/main.py --learning-rate 0.001 --epochs 200
 ```
-Training a model of another dataset with features present - a signed `Erdos-Renyi` graph. Saving the weight output and logs in a custom folder.
+Training a model on another dataset with features present - a signed `Erdos-Renyi` graph. Saving the weights, output and logs in a custom folder.
 ```
 python src/main.py --general-features --edge-path input/erdos_renyi_edges.csv --features-path input/erdos_renyi_features.csv --embedding-path output/embedding/erdos_renyi.csv --regression-weights-path output/weights/erdos_renyi.csv --log-path logs/erdos_renyi.json
 ```
