@@ -134,6 +134,7 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
         :param x_2: Features for right hand side vertices.
         :param edge_index_pos: Positive indices.
         :param edge_index_neg: Negative indices.
+        :return out: Abstract convolved features.
         """
         edge_index_pos, _ = remove_self_loops(edge_index_pos, None)
         edge_index_pos = add_self_loops(edge_index_pos, num_nodes=x_1.size(0))
@@ -157,5 +158,4 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
 
         if self.norm_embed:
             out = F.normalize(out, p=2, dim=-1)
-
         return out
