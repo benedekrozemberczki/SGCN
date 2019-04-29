@@ -4,8 +4,8 @@ import pandas as pd
 import networkx as nx
 from scipy import sparse
 from texttable import Texttable
-from sklearn.metrics import roc_auc_score, f1_score
 from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import roc_auc_score, f1_score
 
 def read_graph(args):
     """
