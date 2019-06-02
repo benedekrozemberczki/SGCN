@@ -16,7 +16,7 @@ This repository provides an implementation for SGCN as described in the paper:
 > ICDM, 2018.
 > [[Paper]](https://arxiv.org/abs/1808.06354)
 
-The original implementation is available [[here]](https://www.cse.msu.edu/~derrtyle/code/SGCN.zip) and SGCN is also available in [[PyTorch Geometric]]().
+The original implementation is available [[here]](https://www.cse.msu.edu/~derrtyle/code/SGCN.zip) and SGCN is also available in [[PyTorch Geometric]](https://github.com/rusty1s/pytorch_geometric).
 
 ### Requirements
 
