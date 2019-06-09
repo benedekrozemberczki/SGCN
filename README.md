@@ -1,5 +1,5 @@
 SGCN  	[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/signed-graph-convolutional-network/link-sign-prediction-on-bitcoin-alpha)](https://paperswithcode.com/sota/link-sign-prediction-on-bitcoin-alpha?p=signed-graph-convolutional-network)
-	<img src="https://img.shields.io/badge/stars-50+-blue.svg"/>
+	<img src="https://img.shields.io/badge/stars-70+-blue.svg"/>
         <img src="https://img.shields.io/badge/forks-10+-blue.svg"/>
 	<img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 ============================================
