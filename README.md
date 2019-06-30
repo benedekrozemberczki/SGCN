@@ -1,7 +1,4 @@
-SGCN  	[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/signed-graph-convolutional-network/link-sign-prediction-on-bitcoin-alpha)](https://paperswithcode.com/sota/link-sign-prediction-on-bitcoin-alpha?p=signed-graph-convolutional-network)
-	<img src="https://img.shields.io/badge/stars-80+-blue.svg"/>
-        <img src="https://img.shields.io/badge/forks-15+-blue.svg"/>
-	<img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
+SGCN  	[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/signed-graph-convolutional-network/link-sign-prediction-on-bitcoin-alpha)](https://paperswithcode.com/sota/link-sign-prediction-on-bitcoin-alpha?p=signed-graph-convolutional-network)  ![GitHub stars](https://img.shields.io/github/stars/benedekrozemberczki/SGCN.svg?style=plastic) ![GitHub forks](https://img.shields.io/github/forks/benedekrozemberczki/SGCN.svg?color=blue&style=plastic) ![License](https://img.shields.io/github/license/benedekrozemberczki/SGCN.svg?color=blue&style=plastic)
 ============================================
 A PyTorch implementation of "Signed Graph Convolutional Network" (ICDM 2018).
 
