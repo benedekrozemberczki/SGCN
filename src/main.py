@@ -4,7 +4,10 @@ from utils import tab_printer, read_graph, score_printer, save_logs
 
 def main():
     """
-    Parsing command line parameters, creating target matrix, fitting an SGCN, predicting edge signs, and saving the embedding.
+    Parsing command line parameters.
+    Creating target matrix.
+    Fitting an SGCN.
+    Predicting edge signs and saving the embedding.
     """
     args = parameter_parser()
     tab_printer(args)
