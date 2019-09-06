@@ -167,7 +167,6 @@ class SignedGCNTrainer(object):
         self.logs["performance"] = [["Epoch","AUC","F1"]]
         self.logs["training_time"] = [["Epoch","Seconds"]]
 
-
     def setup_dataset(self):
         """
         Creating train and test split.
