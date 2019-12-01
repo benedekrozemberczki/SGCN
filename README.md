@@ -34,9 +34,9 @@ torch-geometric    0.3.1
 torchvision        0.2.1
 ```
 ### Datasets
-
+<p align="justify">
 The code takes an input graph in a csv file. Every row indicates an edge between two nodes separated by a comma. The first row is a header. Nodes should be indexed starting with 0. Sample graphs for the `Bitcoin Alpha`  and `Bitcoin OTC` graphs are included in the  `input/` directory. The structure of the edge dataset is the following:
-
+</p>
 | **NODE ID 1**| **NODE ID 2** | **Sign** | 
 | --- | --- | --- |
 | 0 | 3 |-1 |
@@ -45,9 +45,9 @@ The code takes an input graph in a csv file. Every row indicates an edge between
 | 3 | 1 |-1 |
 | ... | ... |... |
 | n | 9 |-1 |
-
+<p align="justify">
 An attributed dataset for an `Erdos-Renyi` graph is also included in the input folder. **The node feature dataset rows are sorted by ID increasing**. The structure of the features csv has to be the following:
-
+</p>
 | **Feature 1** | **Feature 2** | **Feature 3** |...| **Feature d** |
 | --- | --- | --- | --- |--- |
 |  3 |0 |1.37 |... |1 |
@@ -58,9 +58,9 @@ An attributed dataset for an `Erdos-Renyi` graph is also included in the input f
 |  5 |0 |2.47 |... |21 |
 
 ### Options
-
+<p align="justify">
 Learning an embedding is handled by the `src/main.py` script which provides the following command line arguments.
-
+</p>
 #### Input and output options
 
 ```
