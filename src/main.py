@@ -1,5 +1,7 @@
+"""SGCN runner."""
+
 from sgcn import SignedGCNTrainer
-from parser import parameter_parser
+from param_parser import parameter_parser
 from utils import tab_printer, read_graph, score_printer, save_logs
 
 def main():
