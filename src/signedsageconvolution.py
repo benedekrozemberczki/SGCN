@@ -1,3 +1,5 @@
+"""Layer classes."""
+
 import math
 import torch
 import torch.nn.functional as F
@@ -114,9 +116,9 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
         else:
             out = scatter_add(x[col], row, dim=0, dim_size=x.size(0))
 
-        out = torch.cat((out,x),1)
+        out = torch.cat((out, x), 1)
         out = torch.matmul(out, self.weight)
-        
+
         if self.bias is not None:
             out = out + self.bias
         if self.norm_embed:
@@ -143,15 +145,15 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
 
         row_pos, col_pos = edge_index_pos
         row_neg, col_neg = edge_index_neg
-        
+
         if self.norm:
             out_1 = scatter_mean(x_1[col_pos], row_pos, dim=0, dim_size=x_1.size(0))
             out_2 = scatter_mean(x_2[col_neg], row_neg, dim=0, dim_size=x_2.size(0))
         else:
             out_1 = scatter_add(x_1[col_pos], row_pos, dim=0, dim_size=x_1.size(0))
             out_2 = scatter_add(x_2[col_neg], row_neg, dim=0, dim_size=x_2.size(0))
-            
-        out = torch.cat((out_1,out_2,x_1),1)
+
+        out = torch.cat((out_1, out_2, x_1), 1)
         out = torch.matmul(out, self.weight)
         if self.bias is not None:
             out = out + self.bias
