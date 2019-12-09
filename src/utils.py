@@ -1,7 +1,8 @@
+"""Data reading utils."""
+
 import json
 import numpy as np
 import pandas as pd
-import networkx as nx
 from scipy import sparse
 from texttable import Texttable
 from sklearn.decomposition import TruncatedSVD
@@ -9,7 +10,7 @@ from sklearn.metrics import roc_auc_score, f1_score
 
 def read_graph(args):
     """
-    Method to read graph and create a target matrix with pooled adjacency matrix powers up to the order.
+    Method to read graph and create a target matrix with pooled adjacency matrix powers.
     :param args: Arguments object.
     :return edges: Edges dictionary.
     """
@@ -28,15 +29,16 @@ def tab_printer(args):
     """
     args = vars(args)
     keys = sorted(args.keys())
-    t = Texttable() 
-    t.add_rows([["Parameter", "Value"]] +  [[k.replace("_"," ").capitalize(),args[k]] for k in keys])
+    t = Texttable()
+    t.add_rows([["Parameter", "Value"]])
+    t.add_rows([[k.replace("_", " ").capitalize(), args[k]] for k in keys])
     print(t.draw())
 
 def calculate_auc(targets, predictions, edges):
     """
     Calculate performance measures on test dataset.
     :param targets: Target vector to predict.
-    :param predictions: Predictions vector. 
+    :param predictions: Predictions vector.
     :param edges: Edges dictionary with number of edges etc.
     :return auc: AUC value.
     :return f1: F1-score.
@@ -52,7 +54,7 @@ def score_printer(logs):
     Print the performance for every 10th epoch on the test dataset.
     :param logs: Log dictionary.
     """
-    t = Texttable() 
+    t = Texttable()
     t.add_rows([per for i, per in enumerate(logs["performance"]) if i % 10 == 0])
     print(t.draw())
 
@@ -62,8 +64,8 @@ def save_logs(args, logs):
     :param args: Arguments objects.
     :param logs: Log dictionary.
     """
-    with open(args.log_path,"w") as f:
-            json.dump(logs,f)
+    with open(args.log_path, "w") as f:
+        json.dump(logs, f)
 
 def setup_features(args, positive_edges, negative_edges, node_count):
     """
@@ -98,15 +100,20 @@ def create_spectral_features(args, positive_edges, negative_edges, node_count):
     :param node_count: Number of nodes.
     :return X: Node features.
     """
-    p_edges = positive_edges + [[edge[1],edge[0]] for edge in positive_edges]
-    n_edges = negative_edges + [[edge[1],edge[0]] for edge in negative_edges]
+    p_edges = positive_edges + [[edge[1], edge[0]] for edge in positive_edges]
+    n_edges = negative_edges + [[edge[1], edge[0]] for edge in negative_edges]
     train_edges = p_edges + n_edges
     index_1 = [edge[0] for edge in train_edges]
     index_2 = [edge[1] for edge in train_edges]
     values = [1]*len(p_edges) + [-1]*len(n_edges)
     shaping = (node_count, node_count)
-    signed_A = sparse.csr_matrix(sparse.coo_matrix((values,(index_1,index_2)),shape=shaping,dtype=np.float32))
-    svd = TruncatedSVD(n_components=args.reduction_dimensions, n_iter=args.reduction_iterations, random_state=args.seed)
+    signed_A = sparse.csr_matrix(sparse.coo_matrix((values, (index_1, index_2)),
+                                                   shape=shaping,
+                                                   dtype=np.float32))
+
+    svd = TruncatedSVD(n_components=args.reduction_dimensions,
+                       n_iter=args.reduction_iterations,
+                       random_state=args.seed)
     svd.fit(signed_A)
     X = svd.components_.T
     return X
