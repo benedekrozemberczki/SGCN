@@ -108,7 +108,6 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
         :param edge_index: Indices.
         """
         edge_index, _ = remove_self_loops(edge_index, None)
-        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
         row, col = edge_index
 
         if self.norm:
