@@ -138,9 +138,9 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
         :return out: Abstract convolved features.
         """
         edge_index_pos, _ = remove_self_loops(edge_index_pos, None)
-        edge_index_pos = add_self_loops(edge_index_pos, num_nodes=x_1.size(0))
+        edge_index_pos, _ = add_self_loops(edge_index_pos, num_nodes=x_1.size(0))
         edge_index_neg, _ = remove_self_loops(edge_index_neg, None)
-        edge_index_neg = add_self_loops(edge_index_neg, num_nodes=x_2.size(0))
+        edge_index_neg, _ = add_self_loops(edge_index_neg, num_nodes=x_2.size(0))
 
         row_pos, col_pos = edge_index_pos
         row_neg, col_neg = edge_index_neg
