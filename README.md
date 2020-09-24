@@ -1,6 +1,6 @@
 SGCN
 ============================================
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/signed-graph-convolutional-network/link-sign-prediction-on-bitcoin-alpha)](https://paperswithcode.com/sota/link-sign-prediction-on-bitcoin-alpha?p=signed-graph-convolutional-network)  ![License](https://img.shields.io/github/license/benedekrozemberczki/SGCN.svg?color=blue&style=plastic) [![Arxiv](https://img.shields.io/badge/ArXiv-1808.06354-orange.svg?color=blue&style=plastic)](https://arxiv.org/abs/1808.06354) ![Astro](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fastronomer.ullaakut.eu%2Fshields%3Fowner%3Dbenedekrozemberczki%26name%3DSGCN) [![codebeat badge](https://codebeat.co/badges/f967cf53-f43a-4159-bb24-50f2d7fc1776)](https://codebeat.co/projects/github-com-benedekrozemberczki-sgcn-master)
+![License](https://img.shields.io/github/license/benedekrozemberczki/SGCN.svg?color=blue&style=plastic) [![Arxiv](https://img.shields.io/badge/ArXiv-1808.06354-orange.svg?color=blue&style=plastic)](https://arxiv.org/abs/1808.06354) ![Astro](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fastronomer.ullaakut.eu%2Fshields%3Fowner%3Dbenedekrozemberczki%26name%3DSGCN) [![codebeat badge](https://codebeat.co/badges/f967cf53-f43a-4159-bb24-50f2d7fc1776)](https://codebeat.co/projects/github-com-benedekrozemberczki-sgcn-master)
   
 A PyTorch implementation of "Signed Graph Convolutional Network" (ICDM 2018).
 
