@@ -1,6 +1,6 @@
 SGCN
 ============================================
-![License](https://img.shields.io/github/license/benedekrozemberczki/SGCN.svg?color=blue&style=plastic) [![Arxiv](https://img.shields.io/badge/ArXiv-1808.06354-orange.svg?color=blue&style=plastic)](https://arxiv.org/abs/1808.06354) [![repo size](https://img.shields.io/github/repo-size/benedekrozemberczki/SGCN.svg)](https://github.com/benedekrozemberczki/SGCN/archive/master.zip)
+[![Arxiv](https://img.shields.io/badge/ArXiv-1808.06354-orange.svg?color=blue&style=plastic)](https://arxiv.org/abs/1808.06354) [![repo size](https://img.shields.io/github/repo-size/benedekrozemberczki/SGCN.svg)](https://github.com/benedekrozemberczki/SGCN/archive/master.zip)
  [![codebeat badge](https://codebeat.co/badges/f967cf53-f43a-4159-bb24-50f2d7fc1776)](https://codebeat.co/projects/github-com-benedekrozemberczki-sgcn-master)
   
 A PyTorch implementation of **Signed Graph Convolutional Network (ICDM 2018)**.
@@ -124,3 +124,9 @@ Training a model on another dataset with features present - a signed `Erdos-Reny
 ```
 python src/main.py --general-features --edge-path input/erdos_renyi_edges.csv --features-path input/erdos_renyi_features.csv --embedding-path output/embedding/erdos_renyi.csv --regression-weights-path output/weights/erdos_renyi.csv --log-path logs/erdos_renyi.json
 ```
+
+--------------------------------------------------------------------------------
+
+**License**
+
+- [GNU](https://github.com/benedekrozemberczki/SGCN/blob/master/LICENSE)
