@@ -11,27 +11,27 @@ def parameter_parser():
 
     parser.add_argument("--edge-path",
                         nargs="?",
-                        default="./input/bitcoin_otc.csv",
+                        default="../input/bitcoin_otc.csv",
 	                help="Edge list csv.")
 
     parser.add_argument("--features-path",
                         nargs="?",
-                        default="./input/bitcoin_otc.csv",
+                        default="../input/bitcoin_otc.csv",
 	                help="Edge list csv.")
 
     parser.add_argument("--embedding-path",
                         nargs="?",
-                        default="./output/embedding/bitcoin_otc_sgcn.csv",
+                        default="../output/embedding/bitcoin_otc_sgcn.csv",
 	                help="Target embedding csv.")
 
     parser.add_argument("--regression-weights-path",
                         nargs="?",
-                        default="./output/weights/bitcoin_otc_sgcn.csv",
+                        default="../output/weights/bitcoin_otc_sgcn.csv",
 	                help="Regression weights csv.")
 
     parser.add_argument("--log-path",
                         nargs="?",
-                        default="./logs/bitcoin_otc_logs.json",
+                        default="../logs/bitcoin_otc_logs.json",
 	                help="Log json.")
 
     parser.add_argument("--epochs",
