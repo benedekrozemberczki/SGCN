@@ -70,6 +70,7 @@ An attributed dataset for an `Erdos-Renyi` graph is also included in the input f
 <p align="justify">
 Learning an embedding is handled by the `src/main.py` script which provides the following command line arguments.
 </p>
+
 #### Input and output options
 
 ```
@@ -89,9 +90,9 @@ Learning an embedding is handled by the `src/main.py` script which provides the 
   --seed                  INT         Random seed value.                   Default is 42.
   --lamb                  FLOAT       Embedding regularization parameter.  Default is 1.0.
   --test-size             FLOAT       Test ratio.                          Default is 0.2.  
-  --learning-rate         FLOAT       Learning rate.                       Default is 0.001.  
+  --learning-rate         FLOAT       Learning rate.                       Default is 0.01.  
   --weight-decay          FLOAT       Weight decay.                        Default is 10^-5. 
-  --layers                LST         Layer sizes in model.                Default is [64, 32].
+  --layers                LST         Layer sizes in model.                Default is [32, 32].
   --spectral-features     BOOL        Layer sizes in autoencoder model.    Default is True
   --general-features      BOOL        Loss calculation for the model.      Sets spectral features to False.  
 ```
