@@ -43,11 +43,12 @@ def calculate_auc(targets, predictions, edges):
     :return auc: AUC value.
     :return f1: F1-score.
     """
-    neg_ratio = len(edges["negative_edges"])/edges["ecount"]
     targets = [0 if target == 1 else 1 for target in targets]
     auc = roc_auc_score(targets, predictions)
-    f1 = f1_score(targets, [1 if p > neg_ratio else 0 for p in  predictions])
-    return auc, f1
+    pred = [1 if p > 0.5 else 0 for p in  predictions]
+    f1 = f1_score(targets, pred)
+    pos_ratio = sum(pred)/len(pred)
+    return auc, f1, pos_ratio
 
 def score_printer(logs):
     """

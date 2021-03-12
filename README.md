@@ -106,8 +106,10 @@ Training an SGCN model on the default dataset. Saving the embedding, regression 
 python src/main.py
 ```
 <p align="center">
-<img style="float: center;" src="sgcn_run_example.jpg">
+<img style="float: center;" src="sgcn_run_example.png">
 </p>
+
+``pos_ratio" in the output table gives the ratio of test links predicted to be positive.
 
 Creating an SGCN model of the default dataset with a 96-64-32 architecture.
 ```

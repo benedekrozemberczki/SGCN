@@ -181,7 +181,7 @@ class SignedGCNTrainer(object):
         """
         self.logs = {}
         self.logs["parameters"] = vars(self.args)
-        self.logs["performance"] = [["Epoch", "AUC", "F1"]]
+        self.logs["performance"] = [["Epoch", "AUC", "F1", "pos_ratio"]]
         self.logs["training_time"] = [["Epoch", "Seconds"]]
 
     def setup_dataset(self):
@@ -225,8 +225,8 @@ class SignedGCNTrainer(object):
         predictions = probability_scores[:, 0]/probability_scores[:, 0:2].sum(1)
         predictions = predictions.cpu().detach().numpy()
         targets = [0]*len(self.test_positive_edges) + [1]*len(self.test_negative_edges)
-        auc, f1 = calculate_auc(targets, predictions, self.edges)
-        self.logs["performance"].append([epoch+1, auc, f1])
+        auc, f1, pos_ratio = calculate_auc(targets, predictions, self.edges)
+        self.logs["performance"].append([epoch+1, auc, f1, pos_ratio])
 
     def create_and_train_model(self):
         """
