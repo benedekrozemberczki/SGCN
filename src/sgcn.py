@@ -13,6 +13,7 @@ from utils import calculate_auc, setup_features
 from sklearn.model_selection import train_test_split
 from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 from signedsageconvolution import ListModule
+from utils import structured_negative_sampling
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
     """
@@ -60,7 +61,9 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         self.positive_aggregators = ListModule(*self.positive_aggregators)
         self.negative_aggregators = ListModule(*self.negative_aggregators)
         self.regression_weights = Parameter(torch.Tensor(4*self.neurons[-1], 3))
+        self.regression_bias = Parameter(torch.FloatTensor(3))
         init.xavier_normal_(self.regression_weights)
+        self.regression_bias.data.fill_(0.0)
 
     def calculate_regression_loss(self, z, target):
         """
@@ -79,7 +82,7 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         surr_pos_j = torch.cat((self.positive_z_j, self.positive_z_k), 1)
 
         features = torch.cat((pos, neg, surr_neg_i, surr_neg_j, surr_pos_i, surr_pos_j))
-        predictions = torch.mm(features, self.regression_weights)
+        predictions = torch.mm(features, self.regression_weights) + self.regression_bias
         predictions_soft = F.log_softmax(predictions, dim=1)
         loss_term = F.nll_loss(predictions_soft, target)
         return loss_term, predictions_soft
@@ -89,42 +92,30 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         Calculating the loss on the positive edge embedding distances
         :param z: Hidden vertex representation.
         :param positive_edges: Positive training edges.
-        :return loss_term: Loss value on positive edge embedding.
+        :return : Loss value on positive edge embedding.
         """
-        self.positive_surrogates = [random.choice(self.nodes) for node in range(positive_edges.shape[1])]
-        self.positive_surrogates = torch.from_numpy(np.array(self.positive_surrogates, dtype=np.int64).T)
-        self.positive_surrogates = self.positive_surrogates.type(torch.long).to(self.device)
-        positive_edges = torch.t(positive_edges)
-        self.positive_z_i = z[positive_edges[:, 0], :]
-        self.positive_z_j = z[positive_edges[:, 1], :]
-        self.positive_z_k = z[self.positive_surrogates, :]
-        norm_i_j = torch.norm(self.positive_z_i-self.positive_z_j, 2, 1, True).pow(2)
-        norm_i_k = torch.norm(self.positive_z_i-self.positive_z_k, 2, 1, True).pow(2)
-        term = norm_i_j-norm_i_k
-        term[term < 0] = 0
-        loss_term = term.mean()
-        return loss_term
+        i, j, k = structured_negative_sampling(positive_edges,z.shape[0])
+        self.positive_z_i = z[i]
+        self.positive_z_j = z[j]
+        self.positive_z_k = z[k]
+
+        out = (z[i] - z[j]).pow(2).sum(dim=1) - (z[i] - z[k]).pow(2).sum(dim=1)
+        return torch.clamp(out, min=0).mean()
 
     def calculate_negative_embedding_loss(self, z, negative_edges):
         """
         Calculating the loss on the negative edge embedding distances
         :param z: Hidden vertex representation.
         :param negative_edges: Negative training edges.
-        :return loss_term: Loss value on negative edge embedding.
+        :return : Loss value on negative edge embedding.
         """
-        self.negative_surrogates = [random.choice(self.nodes) for node in range(negative_edges.shape[1])]
-        self.negative_surrogates = torch.from_numpy(np.array(self.negative_surrogates, dtype=np.int64).T)
-        self.negative_surrogates = self.negative_surrogates.type(torch.long).to(self.device)
-        negative_edges = torch.t(negative_edges)
-        self.negative_z_i = z[negative_edges[:, 0], :]
-        self.negative_z_j = z[negative_edges[:, 1], :]
-        self.negative_z_k = z[self.negative_surrogates, :]
-        norm_i_j = torch.norm(self.negative_z_i-self.negative_z_j, 2, 1, True).pow(2)
-        norm_i_k = torch.norm(self.negative_z_i-self.negative_z_k, 2, 1, True).pow(2)
-        term = norm_i_k-norm_i_j
-        term[term < 0] = 0
-        loss_term = term.mean()
-        return loss_term
+        i, j, k = structured_negative_sampling(negative_edges,z.shape[0])
+        self.negative_z_i = z[i]
+        self.negative_z_j = z[j]
+        self.negative_z_k = z[k]
+
+        out = (z[i] - z[k]).pow(2).sum(dim=1) - (z[i] - z[j]).pow(2).sum(dim=1)
+        return torch.clamp(out, min=0).mean()
 
     def calculate_loss_function(self, z, positive_edges, negative_edges, target):
         """
@@ -220,7 +211,7 @@ class SignedGCNTrainer(object):
         score_negative_edges = torch.from_numpy(np.array(self.test_negative_edges, dtype=np.int64).T).type(torch.long).to(self.device)
         test_positive_z = torch.cat((self.train_z[score_positive_edges[0, :], :], self.train_z[score_positive_edges[1, :], :]), 1)
         test_negative_z = torch.cat((self.train_z[score_negative_edges[0, :], :], self.train_z[score_negative_edges[1, :], :]), 1)
-        scores = torch.mm(torch.cat((test_positive_z, test_negative_z), 0), self.model.regression_weights.to(self.device))
+        scores = torch.mm(torch.cat((test_positive_z, test_negative_z), 0), self.model.regression_weights.to(self.device)) + self.model.regression_bias.to(self.device)
         probability_scores = torch.exp(F.softmax(scores, dim=1))
         predictions = probability_scores[:, 0]/probability_scores[:, 0:2].sum(1)
         predictions = predictions.cpu().detach().numpy()
@@ -260,8 +251,9 @@ class SignedGCNTrainer(object):
         self.train_z = np.concatenate([np.array(range(self.train_z.shape[0])).reshape(-1, 1), self.train_z], axis=1)
         self.train_z = pd.DataFrame(self.train_z, columns=embedding_header)
         self.train_z.to_csv(self.args.embedding_path, index=None)
-        print("\nRegression weights are saved.\n")
+        print("\nRegression parameters are saved.\n")
         self.regression_weights = self.model.regression_weights.cpu().detach().numpy().T
-        regression_header = ["x_" + str(x) for x in range(self.regression_weights.shape[1])]
-        self.regression_weights = pd.DataFrame(self.regression_weights, columns=regression_header)
-        self.regression_weights.to_csv(self.args.regression_weights_path, index=None)
+        self.regression_bias = self.model.regression_bias.cpu().detach().numpy().reshape((3, 1))
+        regression_header = ["x_" + str(x) for x in range(self.regression_weights.shape[1])] + ["bias"]
+        self.regression_params = pd.DataFrame(np.concatenate((self.regression_weights, self.regression_bias), axis=1), columns=regression_header)
+        self.regression_params.to_csv(self.args.regression_weights_path, index=None)

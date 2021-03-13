@@ -99,9 +99,10 @@ Learning an embedding is handled by the `src/main.py` script which provides the 
 
 ### Examples
 
-The following commands learn a node embedding, regression weights and write the embedding to disk. The node representations are ordered by the ID. The layer sizes can be set manually.
+The following commands learn a node embedding, regression parameters and write the embedding to disk. The node representations are ordered by the ID. The layer sizes can be set manually.
 
 Training an SGCN model on the default dataset. Saving the embedding, regression weights and logs at default paths.
+The regression weight file contains weights and bias (last column).
 ```
 python src/main.py
 ```
