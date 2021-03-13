@@ -13,6 +13,7 @@ from utils import calculate_auc, setup_features
 from sklearn.model_selection import train_test_split
 from signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 from signedsageconvolution import ListModule
+from utils import structured_negative_sampling
 
 class SignedGraphConvolutionalNetwork(torch.nn.Module):
     """
@@ -89,42 +90,30 @@ class SignedGraphConvolutionalNetwork(torch.nn.Module):
         Calculating the loss on the positive edge embedding distances
         :param z: Hidden vertex representation.
         :param positive_edges: Positive training edges.
-        :return loss_term: Loss value on positive edge embedding.
+        :return : Loss value on positive edge embedding.
         """
-        self.positive_surrogates = [random.choice(self.nodes) for node in range(positive_edges.shape[1])]
-        self.positive_surrogates = torch.from_numpy(np.array(self.positive_surrogates, dtype=np.int64).T)
-        self.positive_surrogates = self.positive_surrogates.type(torch.long).to(self.device)
-        positive_edges = torch.t(positive_edges)
-        self.positive_z_i = z[positive_edges[:, 0], :]
-        self.positive_z_j = z[positive_edges[:, 1], :]
-        self.positive_z_k = z[self.positive_surrogates, :]
-        norm_i_j = torch.norm(self.positive_z_i-self.positive_z_j, 2, 1, True).pow(2)
-        norm_i_k = torch.norm(self.positive_z_i-self.positive_z_k, 2, 1, True).pow(2)
-        term = norm_i_j-norm_i_k
-        term[term < 0] = 0
-        loss_term = term.mean()
-        return loss_term
+        i, j, k = structured_negative_sampling(positive_edges,z.shape[0])
+        self.positive_z_i = z[i]
+        self.positive_z_j = z[j]
+        self.positive_z_k = z[k]
+
+        out = (z[i] - z[j]).pow(2).sum(dim=1) - (z[i] - z[k]).pow(2).sum(dim=1)
+        return torch.clamp(out, min=0).mean()
 
     def calculate_negative_embedding_loss(self, z, negative_edges):
         """
         Calculating the loss on the negative edge embedding distances
         :param z: Hidden vertex representation.
         :param negative_edges: Negative training edges.
-        :return loss_term: Loss value on negative edge embedding.
+        :return : Loss value on negative edge embedding.
         """
-        self.negative_surrogates = [random.choice(self.nodes) for node in range(negative_edges.shape[1])]
-        self.negative_surrogates = torch.from_numpy(np.array(self.negative_surrogates, dtype=np.int64).T)
-        self.negative_surrogates = self.negative_surrogates.type(torch.long).to(self.device)
-        negative_edges = torch.t(negative_edges)
-        self.negative_z_i = z[negative_edges[:, 0], :]
-        self.negative_z_j = z[negative_edges[:, 1], :]
-        self.negative_z_k = z[self.negative_surrogates, :]
-        norm_i_j = torch.norm(self.negative_z_i-self.negative_z_j, 2, 1, True).pow(2)
-        norm_i_k = torch.norm(self.negative_z_i-self.negative_z_k, 2, 1, True).pow(2)
-        term = norm_i_k-norm_i_j
-        term[term < 0] = 0
-        loss_term = term.mean()
-        return loss_term
+        i, j, k = structured_negative_sampling(negative_edges,z.shape[0])
+        self.negative_z_i = z[i]
+        self.negative_z_j = z[j]
+        self.negative_z_k = z[k]
+
+        out = (z[i] - z[k]).pow(2).sum(dim=1) - (z[i] - z[j]).pow(2).sum(dim=1)
+        return torch.clamp(out, min=0).mean()
 
     def calculate_loss_function(self, z, positive_edges, negative_edges, target):
         """
