@@ -134,3 +134,5 @@ python src/main.py --general-features --edge-path input/erdos_renyi_edges.csv --
 **License**
 
 - [GNU](https://github.com/benedekrozemberczki/SGCN/blob/master/LICENSE)
+
+--------------------------------------------------------------------------------
