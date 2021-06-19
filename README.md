@@ -39,6 +39,7 @@ torch-cluster     1.4.5
 torch-geometric   1.3.2
 torchvision       0.3.0
 ```
+----------------------------------------------------
 ### Datasets
 <p align="justify">
 The code takes an input graph in a csv file. Every row indicates an edge between two nodes separated by a comma. The first row is a header. Nodes should be indexed starting with 0. Sample graphs for the `Bitcoin Alpha`  and `Bitcoin OTC` graphs are included in the  `input/` directory. The structure of the edge dataset is the following:
