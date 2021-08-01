@@ -1,5 +1,5 @@
 SGCN
-============================================
+=======================================
 [![Arxiv](https://img.shields.io/badge/ArXiv-1808.06354-orange.svg?color=blue)](https://arxiv.org/abs/1808.06354) [![repo size](https://img.shields.io/github/repo-size/benedekrozemberczki/SGCN.svg)](https://github.com/benedekrozemberczki/SGCN/archive/master.zip)
  [![codebeat badge](https://codebeat.co/badges/f967cf53-f43a-4159-bb24-50f2d7fc1776)](https://codebeat.co/projects/github-com-benedekrozemberczki-sgcn-master)⠀[![benedekrozemberczki](https://img.shields.io/twitter/follow/benrozemberczki?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=benrozemberczki)
   
